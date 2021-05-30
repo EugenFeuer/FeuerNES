@@ -198,15 +198,15 @@ impl CPU {
                 }
                 0xAD => {
                     self.lda(&AddressMode::Absolute);
-                    self.pc += 1;
+                    self.pc += 2;
                 }
                 0xBD => {
                     self.lda(&AddressMode::AbsoluteX);
-                    self.pc += 1;
+                    self.pc += 2;
                 }
                 0xB9 => {
                     self.lda(&AddressMode::AbsoluteY);
-                    self.pc += 1;
+                    self.pc += 2;
                 }
                 0xA1 => {
                     self.lda(&AddressMode::IndirectX);
