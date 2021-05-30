@@ -1,5 +1,8 @@
 #[path = "cpu/cpu.rs"] mod cpu;
 
+#[macro_use]
+extern crate lazy_static;
+
 fn main() {
     let mut cpu = cpu::CPU::new();
     

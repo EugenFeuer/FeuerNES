@@ -1,10 +1,14 @@
-﻿const PROGRAM_BEGIN_LOC: u16 = 0x8000;
+﻿mod opcode;
+
+use std::collections::HashMap;
+
+const PROGRAM_BEGIN_LOC: u16 = 0x8000;
 const RESET_INTERRUPT_MEM_LOC: u16 = 0xFFFC;
 
 const MEMORY_CAP: usize = 0xFFFF;
 
 #[derive(Debug)]
-enum AddressMode {
+pub enum AddressMode {
     Immediate,
     ZeroPage,
     ZeroPageX,
@@ -180,87 +184,36 @@ impl CPU {
     }
 
     pub fn interprect(&mut self) -> () {
+        let ref opcodes: HashMap<u8, &'static opcode::Opcode> = *opcode::OPCODES_MAP;
         loop {
-            let opcode = self.mem.read(self.pc);
+            let op = self.mem.read(self.pc);
             self.pc += 1;
+            let pc_state = self.pc;
 
-            match opcode {
+            let code = opcodes.get(&op).expect(&format!("op: {:x} not exists or not impl.", op));
+
+            match op {
                 0x00 => {
                     return;
                 }
-                // begin of LDA
-                0xA9 => {
-                    self.lda(&AddressMode::Immediate);
-                    self.pc += 1;
-                }
-                0xA5 => {
-                    self.lda(&AddressMode::ZeroPage);
-                    self.pc += 1;
-                }
-                0xB5 => {
-                    self.lda(&AddressMode::ZeroPageX);
-                    self.pc += 1;
-                }
-                0xAD => {
-                    self.lda(&AddressMode::Absolute);
-                    self.pc += 2;
-                }
-                0xBD => {
-                    self.lda(&AddressMode::AbsoluteX);
-                    self.pc += 2;
-                }
-                0xB9 => {
-                    self.lda(&AddressMode::AbsoluteY);
-                    self.pc += 2;
-                }
-                0xA1 => {
-                    self.lda(&AddressMode::IndirectX);
-                    self.pc += 1;
-                }
-                0xB1 => {
-                    self.lda(&AddressMode::IndirectY);
-                    self.pc += 1;
-                }
-                // end of LDA
                 0xAA => {
-                    self.pc += 1;
                     self.tax();
                 }
-
-                // begin of STA
-                0x85 => {
-                    self.sta(&AddressMode::ZeroPage);
-                    self.pc += 1;
+                // LDA
+                0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
+                    self.lda(&code.mode);
                 }
-                0x95 => {
-                    self.sta(&AddressMode::ZeroPageX);
-                    self.pc += 1;
+                // STA
+                0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
+                    self.sta(&code.mode);
                 }
-                0x8D => {
-                    self.sta(&AddressMode::Absolute);
-                    self.pc += 2;
-                }
-                0x9D => {
-                    self.sta(&AddressMode::AbsoluteX);
-                    self.pc += 2;
-                }
-                0x99 => {
-                    self.sta(&AddressMode::AbsoluteY);
-                    self.pc += 2;
-                }
-                0x81 => {
-                    self.sta(&AddressMode::IndirectX);
-                    self.pc += 1;
-                }
-                0x91 => {
-                    self.sta(&AddressMode::IndirectY);
-                    self.pc += 1;
-                }
-                // end of STA
-
                 _ => {
 
                 }
+            }
+
+            if pc_state == self.pc {
+                self.pc += (code.bytes - 1) as u16
             }
         }
     }
