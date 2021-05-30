@@ -10,7 +10,7 @@ fn main() {
 
     // program [0x8000..0x10000]
     let program: Vec<u8> = vec!(
-        0x9A, 0x20, 0x0
+        0xA9, 0x20, 0x0
     );
 
     let mut bytes = [0u8; 0xFFFF];
