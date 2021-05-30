@@ -150,6 +150,11 @@ impl CPU {
         self.update_zero_flag(value);
     }
 
+    fn sta(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        self.mem.write(addr, self.acc);
+    }
+
     fn tax(&mut self) {
         self.rx = self.acc;
         self.update_neg_flag(self.rx);
@@ -221,6 +226,38 @@ impl CPU {
                     self.pc += 1;
                     self.tax();
                 }
+
+                // begin of STA
+                0x85 => {
+                    self.sta(&AddressMode::ZeroPage);
+                    self.pc += 1;
+                }
+                0x95 => {
+                    self.sta(&AddressMode::ZeroPageX);
+                    self.pc += 1;
+                }
+                0x8D => {
+                    self.sta(&AddressMode::Absolute);
+                    self.pc += 2;
+                }
+                0x9D => {
+                    self.sta(&AddressMode::AbsoluteX);
+                    self.pc += 2;
+                }
+                0x99 => {
+                    self.sta(&AddressMode::AbsoluteY);
+                    self.pc += 2;
+                }
+                0x81 => {
+                    self.sta(&AddressMode::IndirectX);
+                    self.pc += 1;
+                }
+                0x91 => {
+                    self.sta(&AddressMode::IndirectY);
+                    self.pc += 1;
+                }
+                // end of STA
+
                 _ => {
 
                 }
