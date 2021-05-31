@@ -191,6 +191,33 @@ impl CPU {
         }
     }
 
+    fn add_to_acc(&mut self, data: u8) {
+        let cur_carry: u16 = if self.status.contains(CPUStatus::CARRY) {
+            1
+        } else {
+            0
+        };
+
+        // A = A + M + C
+        let sum = self.acc as u16 +
+                  data     as u16 +
+                  cur_carry;
+
+        // update flags
+        self.update_carry_flag(sum > 0xFF);
+
+        let res = sum as u8;
+        // (M ^ result) & (N ^ result) & 0x80 != 0
+        self.update_overflow_flag((data ^ res) & (self.acc ^ res) & 0x80 != 0);
+
+        self.acc = res;
+    }
+
+    fn adc(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        self.add_to_acc(self.mem.read(addr));
+    }
+
     fn lda(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
@@ -252,6 +279,10 @@ impl CPU {
                 // STA
                 0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
                     self.sta(&code.mode);
+                }
+                // ADC
+                0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
+                    self.adc(&code.mode);
                 }
                 _ => {
 
