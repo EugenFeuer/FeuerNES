@@ -59,13 +59,43 @@ impl Memory {
     }
 }
 
+/*
+http://wiki.nesdev.com/w/index.php/Status_flags
+
+    7  bit  0
+    ---- ----
+    NV_B DIZC
+    || | ||||
+    || | |||+- Carry
+    || | ||+-- Zero
+    || | |+--- Interrupt Disable
+    || | +---- Decimal
+    || +------ Break
+    ||
+    |+-------- Overflow
+    +--------- Negative
+*/
+
+bitflags::bitflags! {
+    pub struct CPUStatus: u8 {
+        const NEGATIVE          = 0b1000_0000;
+        const OVERFLOW          = 0b0100_0000;
+        const UNDEFINED         = 0b0010_0000;
+        const BREAK             = 0b0001_0000;
+        const DECIMAL           = 0b0000_1000;
+        const INTERRUPT_DISABLE = 0b0000_0100;
+        const ZERO              = 0b0000_0010;
+        const CARRY             = 0b1000_0001;
+    }
+}
+
 pub struct CPU {
     pc: u16,
     sp: u8,
     acc: u8,
     rx: u8,
     ry: u8,
-    status: u8,
+    status: CPUStatus,
     mem: Memory
 }
 
@@ -77,7 +107,7 @@ impl CPU {
             acc: 0,
             rx: 0,
             ry: 0,
-            status: 0,
+            status: CPUStatus::from_bits_truncate(0b0010_0100),
             mem: Memory::new()
         }
     }
@@ -131,17 +161,33 @@ impl CPU {
 
     fn update_zero_flag(&mut self, flag: u8) {
         if flag == 0 {
-            self.status |= 0b0000_0010
+            self.status.insert(CPUStatus::ZERO);
         } else {
-            self.status &= 0b1111_1101
+            self.status.remove(CPUStatus::ZERO);
         }
     }
 
     fn update_neg_flag(&mut self, flag: u8) {
         if flag & 0b1000_0000 != 0 {
-            self.status |= 0b1000_0000
+            self.status.insert(CPUStatus::NEGATIVE);
         } else {
-            self.status &= 0b0111_1111
+            self.status.remove(CPUStatus::NEGATIVE);
+        }
+    }
+
+    fn update_overflow_flag(&mut self, flag: bool) {
+        if flag {
+            self.status.insert(CPUStatus::OVERFLOW);
+        } else {
+            self.status.remove(CPUStatus::OVERFLOW);
+        }
+    }
+
+    fn update_carry_flag(&mut self, flag: bool) {
+        if flag {
+            self.status.insert(CPUStatus::CARRY);
+        } else {
+            self.status.remove(CPUStatus::CARRY);
         }
     }
 
@@ -173,7 +219,7 @@ impl CPU {
     pub fn reset(&mut self) {
         self.acc = 0;
         self.rx = 0;
-        self.status = 0;
+        self.status = CPUStatus::from_bits_truncate(0b0010_0100);
 
         self.pc = self.mem.read_u16(RESET_INTERRUPT_MEM_LOC);
     }
