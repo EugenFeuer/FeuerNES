@@ -263,6 +263,46 @@ impl CPU {
         self.mem.write(addr, value);
     }
 
+    fn branch(&mut self, flag: bool) {
+        if flag {
+            let offset = self.mem.read(self.pc) as u16;
+            let dst = self.pc.wrapping_add(1).wrapping_add(offset);
+            self.pc = dst;
+        }
+    }
+
+    fn bcc(&mut self) {
+        self.branch(!self.status.contains(CPUStatus::CARRY));
+    }
+
+    fn bcs(&mut self) {
+        self.branch(self.status.contains(CPUStatus::CARRY));
+    }
+
+    fn beq(&mut self) {
+        self.branch(self.status.contains(CPUStatus::ZERO));
+    }
+
+    fn bmi(&mut self) {
+        self.branch(self.status.contains(CPUStatus::NEGATIVE));
+    }
+
+    fn bne(&mut self) {
+        self.branch(!self.status.contains(CPUStatus::ZERO));
+    }
+
+    fn bpl(&mut self) {
+        self.branch(!self.status.contains(CPUStatus::NEGATIVE));
+    }
+
+    fn bvc(&mut self) {
+        self.branch(!self.status.contains(CPUStatus::OVERFLOW));
+    }
+
+    fn bvs(&mut self) {
+        self.branch(self.status.contains(CPUStatus::OVERFLOW));
+    }
+
     fn sbc(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr) as i8;
@@ -380,6 +420,31 @@ impl CPU {
                 0x06 | 0x16 | 0x0E | 0x1E => {
                     self.asl(&code.mode);
                 }
+                // BRANCH
+                0x90 => {
+                    self.bcc();
+                }
+                0xB0 => {
+                    self.bcs();
+                }
+                0xF0 => {
+                    self.beq();
+                }
+                0x30 => {
+                    self.bmi();
+                }
+                0xD0 => {
+                    self.bne();
+                }
+                0x10 => {
+                    self.bpl();
+                }
+                0x50 => {
+                    self.bvc();
+                }
+                0x70 => {
+                    self.bvs();
+                }
                 // SBC
                 0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 |0xF1 => {
                     self.sbc(&code.mode);
@@ -490,6 +555,127 @@ mod test {
             cpu.load_program(program);
             cpu.run();
             
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        /* test for BRANCH */
+        #[test]
+        fn test_bcc() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x90, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.remove(CPUStatus::CARRY);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bcs() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0xB0, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.insert(CPUStatus::CARRY);
+            cpu.interprect();
+            
+            assert_eq!(cpu.acc, 0x21);  // because the CARRY bit has been set
+        }
+
+        #[test]
+        fn test_beq() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0xF0, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.insert(CPUStatus::ZERO);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bmi() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x30, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.insert(CPUStatus::NEGATIVE);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bne() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0xD0, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.remove(CPUStatus::ZERO);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bpl() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x10, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.remove(CPUStatus::NEGATIVE);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bvc() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x50, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.remove(CPUStatus::OVERFLOW);
+            cpu.interprect();
+
+            assert_eq!(cpu.acc, 0x20);
+        }
+
+        #[test]
+        fn test_bvs() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x70, 0x03, 0x69, 0x10, 0x00, 0x69, 0x20
+            );
+            
+            cpu.load_program(program);
+            cpu.reset();
+            cpu.status.insert(CPUStatus::OVERFLOW);
+            cpu.interprect();
+
             assert_eq!(cpu.acc, 0x20);
         }
 }

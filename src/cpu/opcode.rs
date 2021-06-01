@@ -67,7 +67,6 @@ lazy_static! {
         Opcode::new(0x0E, "ASL", 3, 6, AddressMode::Absolute),
         Opcode::new(0x1E, "ASL", 3, 7, AddressMode::AbsoluteX),
 
-
         Opcode::new(0xE9, "SBC", 2, 2, AddressMode::Immediate),
         Opcode::new(0xE5, "SBC", 2, 3, AddressMode::ZeroPage),
         Opcode::new(0xF5, "SBC", 2, 4, AddressMode::ZeroPageX),
@@ -79,7 +78,17 @@ lazy_static! {
 
         Opcode::new(0x08, "PHP", 1, 3, AddressMode::NoneAddressing),
 
-        Opcode::new(0x28, "PLP", 1, 4, AddressMode::NoneAddressing)
+        Opcode::new(0x28, "PLP", 1, 4, AddressMode::NoneAddressing),
+
+        Opcode::new(0x90, "BCC", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xB0, "BCS", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xF0, "BEQ", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x30, "BMI", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xD0, "BNE", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x10, "BPL", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x50, "BVC", 2, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x70, "BVS", 2, 2, AddressMode::NoneAddressing),
+
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {
