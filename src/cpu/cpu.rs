@@ -85,7 +85,7 @@ bitflags::bitflags! {
         const DECIMAL           = 0b0000_1000;
         const INTERRUPT_DISABLE = 0b0000_0100;
         const ZERO              = 0b0000_0010;
-        const CARRY             = 0b1000_0001;
+        const CARRY             = 0b0000_0001;
     }
 }
 
