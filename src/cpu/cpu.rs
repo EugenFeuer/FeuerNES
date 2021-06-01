@@ -218,6 +218,13 @@ impl CPU {
         self.add_to_acc(self.mem.read(addr));
     }
 
+    fn sbc(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr) as i8;
+        // A = A - M - (1 - C)
+        self.add_to_acc((-value - 1) as u8);
+    }
+
     fn lda(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
@@ -303,6 +310,10 @@ impl CPU {
                 0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
                     self.adc(&code.mode);
                 }
+                // SBC
+                0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 |0xF1 => {
+                    self.sbc(&code.mode);
+                }
                 _ => {
 
                 }
@@ -321,6 +332,7 @@ impl CPU {
 mod test {
     use super::*;
 
+    /* test for ADC */
     #[test]
     fn test_adc() {
         let mut cpu = CPU::new();
@@ -345,5 +357,19 @@ mod test {
         cpu.run();
         
         assert!(cpu.status.contains(CPUStatus::OVERFLOW));
+    }
+
+    /* test for SBC */
+    #[test]
+    fn test_sbc() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0x10, 0xE9, 0x01, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+        
+        assert_eq!(cpu.acc, 0x0E);
     }
 }
