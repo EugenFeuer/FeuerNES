@@ -239,6 +239,30 @@ impl CPU {
         self.acc = res;
     }
 
+    fn asl_acc(&mut self) {
+        let mut res = self.acc;
+
+        self.update_carry_flag(res >> 7 == 1);
+
+        res <<= 1;
+        self.update_neg_flag(res);
+        self.update_zero_flag(res);
+        self.acc = res;
+    }
+
+    fn asl(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let mut value = self.mem.read(addr);
+
+        self.update_carry_flag(value >> 7 == 1);
+
+        value <<= 1;
+        self.update_neg_flag(value);
+        self.update_zero_flag(value);
+        
+        self.mem.write(addr, value);
+    }
+
     fn sbc(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr) as i8;
@@ -349,6 +373,13 @@ impl CPU {
                 0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
                     self.and(&code.mode);
                 }
+                // ASL
+                0x0A => {
+                    self.asl_acc();
+                }
+                0x06 | 0x16 | 0x0E | 0x1E => {
+                    self.asl(&code.mode);
+                }
                 // SBC
                 0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 |0xF1 => {
                     self.sbc(&code.mode);
@@ -432,5 +463,33 @@ mod test {
             cpu.run();
             
             assert_eq!(cpu.acc, 0x01);
+        }
+
+        /* test for ASL */
+        #[test]
+        fn test_asl() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x06, 0xFF, 0x00
+            );
+            
+            cpu.load_program(program);
+            cpu.mem.write(0x00FF, 0x10);
+            cpu.run();
+            
+            assert_eq!(cpu.mem.read(0x00FF), 0x20);
+        }
+
+        #[test]
+        fn test_asl_acc() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x69, 0x10, 0x0A, 0x00
+            );
+            
+            cpu.load_program(program);
+            cpu.run();
+            
+            assert_eq!(cpu.acc, 0x20);
         }
 }
