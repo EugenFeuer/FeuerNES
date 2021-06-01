@@ -60,6 +60,10 @@ lazy_static! {
         Opcode::new(0xF9, "SBC", 3, 4, AddressMode::AbsoluteY),
         Opcode::new(0xE1, "SBC", 2, 6, AddressMode::IndirectX),
         Opcode::new(0xF1, "SBC", 2, 5, AddressMode::IndirectY),
+
+        Opcode::new(0x08, "PHP", 1, 3, AddressMode::NoneAddressing),
+
+        Opcode::new(0x28, "PLP", 1, 4, AddressMode::NoneAddressing)
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {
