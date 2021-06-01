@@ -231,6 +231,14 @@ impl CPU {
         self.add_to_acc(self.mem.read(addr));
     }
 
+    fn and(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let res = self.acc & self.mem.read(addr);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.acc = res;
+    }
+
     fn sbc(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr) as i8;
@@ -337,6 +345,10 @@ impl CPU {
                 0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
                     self.adc(&code.mode);
                 }
+                // AND
+                0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
+                    self.and(&code.mode);
+                }
                 // SBC
                 0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 |0xF1 => {
                     self.sbc(&code.mode);
@@ -407,4 +419,18 @@ mod test {
         
         assert_eq!(cpu.acc, 0x0E);
     }
+
+        /* test for AND */
+        #[test]
+        fn test_and() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x69, 0x0F, 0x29, 0x11, 0x00
+            );
+            
+            cpu.load_program(program);
+            cpu.run();
+            
+            assert_eq!(cpu.acc, 0x01);
+        }
 }
