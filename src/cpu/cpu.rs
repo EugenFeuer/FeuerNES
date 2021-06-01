@@ -314,3 +314,36 @@ impl CPU {
         }
     }
 }
+
+
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_adc() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0x10, 0x69, 0x20, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+
+        assert_eq!(cpu.acc, 0x30);
+    }
+
+    #[test]
+    fn test_adc_overflow() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0xD0, 0x69, 0x90, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+        
+        assert!(cpu.status.contains(CPUStatus::OVERFLOW));
+    }
+}
