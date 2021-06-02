@@ -426,8 +426,9 @@ impl CPU {
 
     fn compare(&mut self, v1: u8, v2: u8) {
         self.update_carry_flag(v1 >= v2);
-        self.update_zero_flag(v1 - v2);
-        self.update_neg_flag(v1 - v2);
+        let res = v1.wrapping_sub(v2);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
     }
 
     fn cmp(&mut self, mode: &AddressMode) {
