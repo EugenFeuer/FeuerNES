@@ -455,6 +455,36 @@ impl CPU {
         self.update_zero_flag(self.rx);
     }
 
+    fn tay(&mut self) {
+        self.ry = self.acc;
+        self.update_neg_flag(self.ry);
+        self.update_zero_flag(self.ry);
+    }
+
+    fn txa(&mut self) {
+        self.acc = self.rx;
+        self.update_neg_flag(self.acc);
+        self.update_zero_flag(self.acc);
+    }
+
+    fn tya(&mut self) {
+        self.acc = self.ry;
+        self.update_neg_flag(self.acc);
+        self.update_zero_flag(self.acc);
+    }
+
+    fn tsx(&mut self) {
+        self.rx = self.sp;
+        self.update_neg_flag(self.rx);
+        self.update_zero_flag(self.rx);
+    }
+
+    fn txs(&mut self) {
+        self.sp = self.rx;
+        self.update_neg_flag(self.sp);
+        self.update_zero_flag(self.sp);
+    }
+
     pub fn load(&mut self, bytes:[u8; 0xFFFF]) {
         self.mem.load(bytes);
         self.mem.write_u16(RESET_INTERRUPT_MEM_LOC, PROGRAM_BEGIN_LOC);
@@ -497,8 +527,24 @@ impl CPU {
                 0x00 => {
                     return;
                 }
+                // TRANSFER
                 0xAA => {
                     self.tax();
+                }
+                0xA8 => {
+                    self.tay();
+                }
+                0x8A => {
+                    self.txa();
+                }
+                0x98 => {
+                    self.tya();
+                }
+                0xBA => {
+                    self.tsx();
+                }
+                0x9A => {
+                    self.txs();
                 }
                 // LDA
                 0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
@@ -877,5 +923,92 @@ mod test {
 
         assert!(cpu.status.contains(CPUStatus::CARRY));
         assert!(cpu.status.contains(CPUStatus::ZERO));
+    }
+
+    /* test for TRANSFER */
+    #[test]
+    fn test_tax() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0x10, 0xAA, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+
+        assert_eq!(cpu.rx, 0x10);
+    }
+
+    #[test]
+    fn test_tay() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0x10, 0xA8, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+
+        assert_eq!(cpu.ry, 0x10);
+    }
+
+    #[test]
+    fn test_txa() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x8A, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.rx = 0x10;
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x10);
+    }
+
+    #[test]
+    fn test_tya() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x98, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.ry = 0x10;
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x10);
+    }
+
+    #[test]
+    fn test_tsx() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0xBA, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.sp = 0x10;
+        cpu.interprect();
+
+        assert_eq!(cpu.rx, 0x10);
+    }
+
+    #[test]
+    fn test_txs() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x9A, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.rx = 0x10;
+        cpu.interprect();
+
+        assert_eq!(cpu.sp, 0x10);
     }
 }

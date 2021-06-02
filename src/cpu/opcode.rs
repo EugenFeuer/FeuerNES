@@ -24,7 +24,13 @@ impl Opcode {
 lazy_static! {
     pub static ref OPCODES: Vec<Opcode> = vec!(
         Opcode::new(0x00, "BRK", 1, 7, AddressMode::NoneAddressing),
+
         Opcode::new(0xAA, "TAX", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xA8, "TAY", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x8A, "TXA", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x98, "TYA", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xBA, "TSX", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x9A, "TXS", 1, 2, AddressMode::NoneAddressing),
     
         Opcode::new(0xA9, "LDA", 2, 2, AddressMode::Immediate),
         Opcode::new(0xA5, "LDA", 2, 3, AddressMode::ZeroPage),
