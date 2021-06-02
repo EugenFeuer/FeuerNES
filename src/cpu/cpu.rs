@@ -271,6 +271,16 @@ impl CPU {
         self.mem.write(addr, value);
     }
 
+    fn jsr(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read_u16(addr);
+        self.stack_push_u16(value);
+    }
+
+    fn rts(&mut self) {
+        self.pc = self.stack_pop_u16() + 1;
+    }
+
     fn branch(&mut self, flag: bool) {
         if flag {
             let offset = self.mem.read(self.pc) as u16;
@@ -421,6 +431,18 @@ impl CPU {
     fn stack_pop(&mut self) -> u8 {
         self.sp = self.sp.wrapping_add(1);
         self.mem.read(self.sp as u16 + STACK_BOTTOM_LOC)
+    }
+
+    fn stack_push_u16(&mut self, value: u16) {
+        self.stack_push((value >> 8) as u8);    // hi
+        self.stack_push(value as u8);           // lo
+    }
+
+    fn stack_pop_u16(&mut self) -> u16 {
+        let lo = self.stack_pop() as u16;
+        let hi = self.stack_pop() as u16;
+
+        hi << 8 | lo
     }
 
     fn php(&mut self) {
@@ -686,6 +708,14 @@ impl CPU {
                 // PLP
                 0x28 => {
                     self.plp();
+                }
+                // JSR
+                0x20 => {
+                    self.jsr(&code.mode);
+                }
+                // RTS
+                0x60 => {
+                    self.rts();
                 }
                 _ => {
 
