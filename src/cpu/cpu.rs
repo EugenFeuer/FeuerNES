@@ -525,6 +525,18 @@ impl CPU {
         self.update_zero_flag(self.sp);
     }
 
+    fn sec(&mut self) {
+        self.status.insert(CPUStatus::CARRY);
+    }
+
+    fn sed(&mut self) {
+        self.status.insert(CPUStatus::DECIMAL);   
+    }
+
+    fn sei(&mut self) {
+        self.status.insert(CPUStatus::INTERRUPT_DISABLE);
+    }
+
     pub fn load(&mut self, bytes:[u8; 0xFFFF]) {
         self.mem.load(bytes);
         self.mem.write_u16(RESET_INTERRUPT_MEM_LOC, PROGRAM_BEGIN_LOC);
@@ -716,6 +728,16 @@ impl CPU {
                 // RTS
                 0x60 => {
                     self.rts();
+                }
+                // SET
+                0x38 => {
+                    self.sec();
+                }
+                0xF8 => {
+                    self.sed();
+                }
+                0x78 => {
+                    self.sei();
                 }
                 _ => {
 
