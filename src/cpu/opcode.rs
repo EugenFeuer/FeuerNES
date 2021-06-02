@@ -61,6 +61,15 @@ lazy_static! {
         Opcode::new(0x21, "AND", 2, 6, AddressMode::IndirectX),
         Opcode::new(0x31, "AND", 2, 5, AddressMode::IndirectY),
 
+        Opcode::new(0x49, "EOR", 2, 2, AddressMode::Immediate),
+        Opcode::new(0x45, "EOR", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0x55, "EOR", 2, 4, AddressMode::ZeroPageX),
+        Opcode::new(0x4D, "EOR", 3, 4, AddressMode::Absolute),
+        Opcode::new(0x5D, "EOR", 3, 4, AddressMode::AbsoluteX),
+        Opcode::new(0x59, "EOR", 3, 4, AddressMode::AbsoluteY),
+        Opcode::new(0x41, "EOR", 2, 6, AddressMode::IndirectX),
+        Opcode::new(0x51, "EOR", 2, 5, AddressMode::IndirectY),
+
         Opcode::new(0x0A, "ASL", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0x06, "ASL", 2, 5, AddressMode::ZeroPage),
         Opcode::new(0x16, "ASL", 2, 6, AddressMode::ZeroPageX),

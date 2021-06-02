@@ -239,6 +239,14 @@ impl CPU {
         self.acc = res;
     }
 
+    fn eor(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let res = self.acc ^ self.mem.read(addr);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.acc = res;
+    }
+
     fn asl_acc(&mut self) {
         let mut res = self.acc;
 
@@ -485,6 +493,10 @@ impl CPU {
                 0x29 | 0x25 | 0x35 | 0x2D | 0x3D | 0x39 | 0x21 | 0x31 => {
                     self.and(&code.mode);
                 }
+                // EOR
+                0x49 | 0x45 | 0x55 | 0x4D | 0x5D | 0x59 | 0x41 | 0x51 => {
+                    self.eor(&code.mode);
+                }
                 // ASL
                 0x0A => {
                     self.asl_acc();
@@ -639,6 +651,20 @@ mod test {
         cpu.run();
         
         assert_eq!(cpu.acc, 0x01);
+    }
+
+    /* test for EOR */
+    #[test]
+    fn test_eor() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x69, 0x09, 0x49, 0x06, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.run();
+        
+        assert_eq!(cpu.acc, 0x0F);
     }
 
     /* test for ASL */
