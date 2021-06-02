@@ -239,12 +239,83 @@ impl CPU {
         self.acc = res;
     }
 
+    fn ora(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let res = self.acc | self.mem.read(addr);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.acc = res;
+    }
+
     fn eor(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let res = self.acc ^ self.mem.read(addr);
         self.update_zero_flag(res);
         self.update_neg_flag(res);
         self.acc = res;
+    }
+
+    fn rol_acc(&mut self) {
+        let res = (self.acc << 1) | (0x01 & self.status.bits());
+
+        self.update_carry_flag(self.acc >> 7 == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+
+        self.acc = res;
+    }
+
+    fn rol(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        let res = (value << 1) | (0x01 & self.status.bits());
+        
+        self.update_carry_flag(value >> 7 == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.mem.write(addr, res);
+    }
+
+    fn ror_acc(&mut self) {
+        let res = (self.acc >> 1) | ((0x01 & self.status.bits()) << 7);
+
+        self.update_carry_flag(self.acc & 0x01 == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+
+        self.acc = res;
+    }
+
+    fn ror(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        let res = (value >> 1) | ((0x01 & self.status.bits()) << 7);
+
+        self.update_carry_flag(value & 0x01 == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+
+        self.acc = res;
+    }
+
+    fn lsr_acc(&mut self) {
+        let res = self.acc >> 1;
+
+        self.update_carry_flag(self.acc & 0x1 == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.acc = res;
+    }
+
+    fn lsr(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        let res = value >> 1;
+        
+        self.update_carry_flag(value & 0xFE == 1);
+        self.update_zero_flag(res);
+        self.update_neg_flag(res);
+        self.mem.write(addr, res);
     }
 
     fn asl_acc(&mut self) {
@@ -651,6 +722,27 @@ impl CPU {
                 0x06 | 0x16 | 0x0E | 0x1E => {
                     self.asl(&code.mode);
                 }
+                // LSR
+                0x4A => {
+                    self.lsr_acc();
+                }
+                0x46 | 0x56 | 0x4E | 0x5E => {
+                    self.lsr(&code.mode);
+                }
+                // ROL
+                0x2A => {
+                    self.rol_acc();
+                }
+                0x26 | 0x36 | 0x2E | 0x3E => {
+                    self.rol(&code.mode);
+                }
+                // ROR
+                0x6A => {
+                    self.ror_acc();
+                }
+                0x66 | 0x76 | 0x6E | 0x7E => {
+                    self.ror(&code.mode);
+                }
                 // BRANCH
                 0x90 => {
                     self.bcc();
@@ -756,6 +848,22 @@ impl CPU {
                 }
                 0x78 => {
                     self.sei();
+                }
+                // JMP
+                0x4C => {
+                    // absolute
+                    let addr = self.mem.read_u16(self.pc);
+                    self.pc = addr;
+                }
+                0x6C => {
+                    // indirect
+                    // JMP is the only 6502 instruction to support indirection.
+                    // The instruction contains a 16 bit address 
+                    // which identifies the location of the least significant byte of another 16 bit memory address
+                    // which is the real target of the instruction.
+                    // http://www.obelisk.me.uk/6502/addressing.html#IND
+                    let addr = self.mem.read_u16(self.pc);
+                    self.pc = self.mem.read_u16(addr);
                 }
                 _ => {
 
@@ -1106,5 +1214,88 @@ mod test {
         cpu.interprect();
 
         assert_eq!(cpu.sp, 0x10);
+    }
+
+    /* test for LSR */
+    #[test]
+    fn test_lsr() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x4A, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.acc = 0x09;
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x4);
+        assert!(cpu.status.contains(CPUStatus::CARRY));
+    }
+
+    /* test for ROL */
+    #[test]
+    fn test_rol() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x2A, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.acc = 0x40;
+        cpu.status.insert(CPUStatus::CARRY);
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x81);
+        assert!(!cpu.status.contains(CPUStatus::CARRY));
+    }
+
+    /* test for ROR */
+    #[test]
+    fn test_ror() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x6A, 0x00
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.acc = 0x08;
+        cpu.status.insert(CPUStatus::CARRY);
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x84);
+        assert!(!cpu.status.contains(CPUStatus::CARRY));
+    }
+
+    /* test for JMP */
+    #[test]
+    fn test_jmp_absolute() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x4C, 0x05, 0x80, 0x69, 0x10, 0x69, 0x20, 0x0
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x20);
+    }
+
+    #[test]
+    fn test_jmp_indirect() {
+        let mut cpu = CPU::new();
+        let program = vec!(
+            0x6C, 0x00, 0x10, 0x69, 0x10, 0x69, 0x20, 0x0
+        );
+        
+        cpu.load_program(program);
+        cpu.reset();
+        cpu.mem.write_u16(0x1000, 0x8005);
+        cpu.interprect();
+
+        assert_eq!(cpu.acc, 0x20);
     }
 }

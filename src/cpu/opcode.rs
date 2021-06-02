@@ -102,6 +102,24 @@ lazy_static! {
         Opcode::new(0x0E, "ASL", 3, 6, AddressMode::Absolute),
         Opcode::new(0x1E, "ASL", 3, 7, AddressMode::AbsoluteX),
 
+        Opcode::new(0x4A, "LSR", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x46, "LSR", 2, 5, AddressMode::ZeroPage),
+        Opcode::new(0x56, "LSR", 2, 6, AddressMode::ZeroPageX),
+        Opcode::new(0x4E, "LSR", 3, 6, AddressMode::Absolute),
+        Opcode::new(0x5E, "LSR", 3, 7, AddressMode::AbsoluteX),
+
+        Opcode::new(0x2A, "ROL", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x26, "ROL", 2, 5, AddressMode::ZeroPage),
+        Opcode::new(0x36, "ROL", 2, 6, AddressMode::ZeroPageX),
+        Opcode::new(0x2E, "ROL", 3, 6, AddressMode::Absolute),
+        Opcode::new(0xeE, "ROL", 3, 7, AddressMode::AbsoluteX),
+
+        Opcode::new(0x6A, "ROR", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x66, "ROR", 2, 5, AddressMode::ZeroPage),
+        Opcode::new(0x76, "ROR", 2, 6, AddressMode::ZeroPageX),
+        Opcode::new(0x6E, "ROR", 3, 6, AddressMode::Absolute),
+        Opcode::new(0x7E, "ROR", 3, 7, AddressMode::AbsoluteX),
+
         Opcode::new(0xE9, "SBC", 2, 2, AddressMode::Immediate),
         Opcode::new(0xE5, "SBC", 2, 3, AddressMode::ZeroPage),
         Opcode::new(0xF5, "SBC", 2, 4, AddressMode::ZeroPageX),
@@ -171,6 +189,9 @@ lazy_static! {
         Opcode::new(0x38, "SEC", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0xF8, "SED", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0x78, "SEI", 1, 2, AddressMode::NoneAddressing),
+
+        Opcode::new(0x4C, "JMP", 3, 3, AddressMode::Absolute),
+        Opcode::new(0x6C, "JMP", 3, 5, AddressMode::NoneAddressing),
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {
