@@ -96,6 +96,23 @@ lazy_static! {
         Opcode::new(0xD8, "CLD", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0x58, "CLI", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0xB8, "CLV", 1, 2, AddressMode::NoneAddressing),
+
+        Opcode::new(0xC9, "CMP", 2, 2, AddressMode::Immediate),
+        Opcode::new(0xC5, "CMP", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0xD5, "CMP", 2, 4, AddressMode::ZeroPageX),
+        Opcode::new(0xCD, "CMP", 3, 4, AddressMode::Absolute),
+        Opcode::new(0xDD, "CMP", 3, 4, AddressMode::AbsoluteX),
+        Opcode::new(0xD9, "CMP", 3, 4, AddressMode::AbsoluteY),
+        Opcode::new(0xC1, "CMP", 2, 6, AddressMode::IndirectX),
+        Opcode::new(0xD1, "CMP", 2, 5, AddressMode::IndirectY),
+
+        Opcode::new(0xE0, "CPX", 2, 2, AddressMode::Immediate),
+        Opcode::new(0xE4, "CPX", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0xEC, "CPX", 3, 4, AddressMode::Absolute),
+
+        Opcode::new(0xC0, "CPY", 2, 2, AddressMode::Immediate),
+        Opcode::new(0xC4, "CPY", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0xCC, "CPY", 3, 4, AddressMode::Absolute),
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {

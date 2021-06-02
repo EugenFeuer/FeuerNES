@@ -335,6 +335,30 @@ impl CPU {
         self.status.remove(CPUStatus::OVERFLOW);
     }
 
+    fn compare(&mut self, v1: u8, v2: u8) {
+        self.update_carry_flag(v1 >= v2);
+        self.update_zero_flag(v1 - v2);
+        self.update_neg_flag(v1 - v2);
+    }
+
+    fn cmp(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        self.compare(self.acc, value);
+    }
+
+    fn cpx(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        self.compare(self.rx, value);
+    }
+
+    fn cpy(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+        self.compare(self.ry, value);
+    }
+
     fn stack_push(&mut self, value: u8) {
         self.mem.write(self.sp as u16 + STACK_BOTTOM_LOC, value);
         self.sp = self.sp.wrapping_sub(1);
@@ -490,6 +514,16 @@ impl CPU {
                 }
                 0xB8 => {
                     self.clv();
+                }
+                // COMPARE
+                0xC9 | 0xC5 | 0xD5 | 0xCD | 0xDD | 0xD9 | 0xC1 | 0xD1 => {
+                    self.cmp(&code.mode);
+                }
+                0xE0 | 0xE4 | 0xEC => {
+                    self.cpx(&code.mode);
+                }
+                0xC0 | 0xC4 | 0xCC => {
+                    self.cpy(&code.mode);
                 }
                 // PHP
                 0x08 => {
@@ -719,5 +753,33 @@ mod test {
             cpu.interprect();
 
             assert_eq!(cpu.acc, 0x20);
+        }
+
+        /* test for COMPARE */
+        #[test]
+        fn test_cmp1() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x69, 0x10, 0xC9, 0x0F, 0x00
+            );
+            
+            cpu.load_program(program);
+            cpu.run();
+
+            assert!(cpu.status.contains(CPUStatus::CARRY));
+        }
+
+        #[test]
+        fn test_cmp2() {
+            let mut cpu = CPU::new();
+            let program = vec!(
+                0x69, 0x10, 0xC9, 0x10, 0x00
+            );
+            
+            cpu.load_program(program);
+            cpu.run();
+
+            assert!(cpu.status.contains(CPUStatus::CARRY));
+            assert!(cpu.status.contains(CPUStatus::ZERO));
         }
 }
