@@ -444,6 +444,24 @@ impl CPU {
         self.update_zero_flag(value);
     }
 
+    fn ldx(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+
+        self.rx = value;
+        self.update_neg_flag(value);
+        self.update_zero_flag(value);
+    }
+
+    fn ldy(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+
+        self.ry = value;
+        self.update_neg_flag(value);
+        self.update_zero_flag(value);
+    }
+
     fn sta(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         self.mem.write(addr, self.acc);
@@ -549,6 +567,14 @@ impl CPU {
                 // LDA
                 0xA9 | 0xA5 | 0xB5 | 0xAD | 0xBD | 0xB9 | 0xA1 | 0xB1 => {
                     self.lda(&code.mode);
+                }
+                // LDX
+                0xA2 | 0xA6 | 0xB6 | 0xAE | 0xBE => {
+                    self.ldx(&code.mode);
+                }
+                // LDY
+                0xA0 | 0xA4 | 0xB4 | 0xAC | 0xBC => {
+                    self.ldy(&code.mode);
                 }
                 // STA
                 0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
