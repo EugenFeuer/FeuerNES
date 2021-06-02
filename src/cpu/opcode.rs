@@ -90,7 +90,7 @@ lazy_static! {
         Opcode::new(0x70, "BVS", 2, 2, AddressMode::NoneAddressing),
         
         Opcode::new(0x24, "BIT", 2, 3, AddressMode::ZeroPage),
-        Opcode::new(0x2C, "BIT", 4, 4, AddressMode::Absolute),
+        Opcode::new(0x2C, "BIT", 3, 4, AddressMode::Absolute),
 
         Opcode::new(0x18, "CLC", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0xD8, "CLD", 1, 2, AddressMode::NoneAddressing),
