@@ -343,9 +343,9 @@ impl CPU {
     }
 
     fn jsr(&mut self, mode: &AddressMode) {
+        self.stack_push_u16(self.pc + 1);   // PC + 2 - 1
         let addr = self.get_operand_address(mode);
-        let value = self.mem.read_u16(addr);
-        self.stack_push_u16(value);
+        self.pc = addr;
     }
 
     fn rts(&mut self) {
