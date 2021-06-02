@@ -310,6 +310,15 @@ impl CPU {
         self.add_to_acc((-value - 1) as u8);
     }
 
+    fn bit(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        let value = self.mem.read(addr);
+
+        self.update_neg_flag(value);
+        self.update_overflow_flag(value >> 6 == 1);
+        self.update_zero_flag(self.acc & value);
+    }
+
     fn stack_push(&mut self, value: u8) {
         self.mem.write(self.sp as u16 + STACK_BOTTOM_LOC, value);
         self.sp = self.sp.wrapping_sub(1);
@@ -448,6 +457,10 @@ impl CPU {
                 // SBC
                 0xE9 | 0xE5 | 0xF5 | 0xED | 0xFD | 0xF9 | 0xE1 |0xF1 => {
                     self.sbc(&code.mode);
+                }
+                // BIT
+                0x24 | 0x2C => {
+                    self.bit(&code.mode);
                 }
                 // PHP
                 0x08 => {

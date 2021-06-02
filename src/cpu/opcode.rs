@@ -88,7 +88,9 @@ lazy_static! {
         Opcode::new(0x10, "BPL", 2, 2, AddressMode::NoneAddressing),
         Opcode::new(0x50, "BVC", 2, 2, AddressMode::NoneAddressing),
         Opcode::new(0x70, "BVS", 2, 2, AddressMode::NoneAddressing),
-
+        
+        Opcode::new(0x24, "BIT", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0x2C, "BIT", 4, 4, AddressMode::Absolute),
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {
