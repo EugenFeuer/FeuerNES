@@ -319,6 +319,22 @@ impl CPU {
         self.update_zero_flag(self.acc & value);
     }
 
+    fn clc(&mut self) {
+        self.status.remove(CPUStatus::CARRY);
+    }
+
+    fn cld(&mut self) {
+        self.status.remove(CPUStatus::DECIMAL);
+    }
+
+    fn cli(&mut self) {
+        self.status.remove(CPUStatus::INTERRUPT_DISABLE);
+    }
+
+    fn clv(&mut self) {
+        self.status.remove(CPUStatus::OVERFLOW);
+    }
+
     fn stack_push(&mut self, value: u8) {
         self.mem.write(self.sp as u16 + STACK_BOTTOM_LOC, value);
         self.sp = self.sp.wrapping_sub(1);
@@ -461,6 +477,19 @@ impl CPU {
                 // BIT
                 0x24 | 0x2C => {
                     self.bit(&code.mode);
+                }
+                // CLEAR
+                0x18 => {
+                    self.clc();
+                }
+                0xD8 => {
+                    self.cld();
+                }
+                0x58 => {
+                    self.cli();
+                }
+                0xB8 => {
+                    self.clv();
                 }
                 // PHP
                 0x08 => {

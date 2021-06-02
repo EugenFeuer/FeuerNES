@@ -91,6 +91,11 @@ lazy_static! {
         
         Opcode::new(0x24, "BIT", 2, 3, AddressMode::ZeroPage),
         Opcode::new(0x2C, "BIT", 4, 4, AddressMode::Absolute),
+
+        Opcode::new(0x18, "CLC", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xD8, "CLD", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0x58, "CLI", 1, 2, AddressMode::NoneAddressing),
+        Opcode::new(0xB8, "CLV", 1, 2, AddressMode::NoneAddressing),
     );
 
     pub static ref OPCODES_MAP: HashMap<u8, &'static Opcode> = {
