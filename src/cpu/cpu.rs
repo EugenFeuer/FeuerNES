@@ -489,6 +489,16 @@ impl CPU {
         self.mem.write(addr, self.acc);
     }
 
+    fn stx(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        self.mem.write(addr, self.rx);
+    }
+
+    fn sty(&mut self, mode: &AddressMode) {
+        let addr = self.get_operand_address(mode);
+        self.mem.write(addr, self.ry);
+    }
+
     fn tax(&mut self) {
         self.rx = self.acc;
         self.update_neg_flag(self.rx);
@@ -613,6 +623,14 @@ impl CPU {
                 // STA
                 0x85 | 0x95 | 0x8D | 0x9D | 0x99 | 0x81 | 0x91 => {
                     self.sta(&code.mode);
+                }
+                // STX
+                0x86 | 0x96 | 0x8E => {
+                    self.stx(&code.mode);
+                }
+                // STY
+                0x84 | 0x94 | 0x8C => {
+                    self.sty(&code.mode);
                 }
                 // ADC
                 0x69 | 0x65 | 0x75 | 0x6D | 0x7D | 0x79 | 0x61 | 0x71 => {
