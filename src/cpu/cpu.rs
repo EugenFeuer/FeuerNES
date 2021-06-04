@@ -100,7 +100,6 @@ pub struct CPU {
     ry: u8,
     status: CPUStatus,
     mem: Memory
-    callback: Option<fn(cpu: &mut CPU) -> ()>,
 }
 
 impl CPU {
@@ -113,7 +112,6 @@ impl CPU {
             ry: 0,
             status: CPUStatus::from_bits_truncate(CPUStatus::UNUSED.bits()),
             mem: Memory::new()
-            callback: None,
         }
     }
 
@@ -666,21 +664,19 @@ impl CPU {
         self.interprect();
     }
 
-    pub fn set_callback(&mut self, cb: fn(cpu: &mut CPU)->()) {
-        self.callback = Some(cb);
-    } 
+    pub fn interprect(&mut self) {
+        self.interprect_with_callback(|_|{});
+    }
 
-    pub fn interprect(&mut self) -> () {
+    pub fn interprect_with_callback<T>(&mut self, mut callback: T) where T: FnMut(&mut CPU) -> () {
         let ref opcodes: HashMap<u8, &'static opcode::Opcode> = *opcode::OPCODES_MAP;
         loop {
-            if let Some(cb) = self.callback {
-                cb(self);
-            }
             let op = self.mem.read(self.pc);
             self.pc += 1;
             let pc_state = self.pc;
 
             let code = opcodes.get(&op).expect(&format!("op: {:x} not exists or not impl.", op));
+            self.history.push(**code);
 
             match op {
                 0x00 => {
@@ -919,6 +915,8 @@ impl CPU {
             if pc_state == self.pc {
                 self.pc += (code.bytes - 1) as u16
             }
+
+            callback(self);
         }
     }
 }
