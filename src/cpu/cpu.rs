@@ -402,7 +402,7 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr) as i8;
         // A = A - M - (1 - C)
-        self.add_to_acc((-value - 1) as u8);
+        self.add_to_acc((value.wrapping_neg().wrapping_sub(1)) as u8);
     }
 
     fn bit(&mut self, mode: &AddressMode) {
@@ -459,7 +459,7 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
 
-        let res = value - 1;
+        let res = value.wrapping_sub(1);
         self.update_zero_flag(res);
         self.update_neg_flag(res);
 
@@ -467,13 +467,13 @@ impl CPU {
     }
 
     fn dex(&mut self) {
-        self.rx -= 1;
+        self.rx = self.rx.wrapping_sub(1);
         self.update_zero_flag(self.rx);
         self.update_neg_flag(self.rx);
     }
 
     fn dey(&mut self) {
-        self.ry -= 1;
+        self.ry = self.ry.wrapping_sub(1);
         self.update_zero_flag(self.ry);
         self.update_neg_flag(self.ry);
     }
@@ -482,7 +482,7 @@ impl CPU {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
 
-        let res = value + 1;
+        let res = value.wrapping_add(1);
         self.update_zero_flag(res);
         self.update_neg_flag(res);
 
@@ -490,13 +490,13 @@ impl CPU {
     }
 
     fn inx(&mut self) {
-        self.rx += 1;
+        self.rx = self.rx.wrapping_add(1);
         self.update_zero_flag(self.rx);
         self.update_neg_flag(self.rx);
     }
 
     fn iny(&mut self) {
-        self.ry += 1;
+        self.ry = self.ry.wrapping_add(1);
         self.update_zero_flag(self.ry);
         self.update_neg_flag(self.ry);
     }
