@@ -352,6 +352,12 @@ impl CPU {
         self.pc = self.stack_pop_u16() + 1;
     }
 
+    fn rti(&mut self) {
+        self.status.bits = self.stack_pop();
+        self.status.remove(CPUStatus::BREAK);
+        self.pc = self.stack_pop_u16();
+    }
+
     fn branch(&mut self, flag: bool) {
         if flag {
             let offset = self.mem.read(self.pc) as u16;
@@ -529,6 +535,16 @@ impl CPU {
         self.status.remove(CPUStatus::BREAK);
     }
 
+    fn pha(&mut self) {
+        self.stack_push(self.acc);
+    }
+
+    fn pla(&mut self) {
+        self.acc = self.stack_pop();
+        self.update_neg_flag(self.acc);
+        self.update_zero_flag(self.acc);
+    }
+
     fn lda(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
@@ -661,6 +677,10 @@ impl CPU {
                 0x00 => {
                     return;
                 }
+                // NOP
+                0xEA => {
+
+                }
                 // TRANSFER
                 0xAA => {
                     self.tax();
@@ -715,6 +735,10 @@ impl CPU {
                 // EOR
                 0x49 | 0x45 | 0x55 | 0x4D | 0x5D | 0x59 | 0x41 | 0x51 => {
                     self.eor(&code.mode);
+                }
+                // ORA
+                0x09 | 0x05 | 0x15 | 0x0D | 0x1D | 0x19 | 0x01 | 0x11 => {
+                    self.ora(&code.mode);
                 }
                 // ASL
                 0x0A => {
@@ -828,9 +852,17 @@ impl CPU {
                 0x08 => {
                     self.php();
                 }
+                // PHA
+                0x48 => {
+                    self.pha();
+                }
                 // PLP
                 0x28 => {
                     self.plp();
+                }
+                // PLA
+                0x68 => {
+                    self.pla();
                 }
                 // JSR
                 0x20 => {
@@ -839,6 +871,10 @@ impl CPU {
                 // RTS
                 0x60 => {
                     self.rts();
+                }
+                // RTI
+                0x40 => {
+                    self.rti();
                 }
                 // SET
                 0x38 => {

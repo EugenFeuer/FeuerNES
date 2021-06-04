@@ -24,6 +24,7 @@ impl Opcode {
 lazy_static! {
     pub static ref OPCODES: Vec<Opcode> = vec!(
         Opcode::new(0x00, "BRK", 1, 7, AddressMode::NoneAddressing),
+        Opcode::new(0xEA, "NOP", 1, 2, AddressMode::NoneAddressing),
 
         Opcode::new(0xAA, "TAX", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0xA8, "TAY", 1, 2, AddressMode::NoneAddressing),
@@ -96,6 +97,15 @@ lazy_static! {
         Opcode::new(0x41, "EOR", 2, 6, AddressMode::IndirectX),
         Opcode::new(0x51, "EOR", 2, 5, AddressMode::IndirectY),
 
+        Opcode::new(0x09, "ORA", 2, 2, AddressMode::Immediate),
+        Opcode::new(0x05, "ORA", 2, 3, AddressMode::ZeroPage),
+        Opcode::new(0x15, "ORA", 2, 4, AddressMode::ZeroPageX),
+        Opcode::new(0x0D, "ORA", 3, 4, AddressMode::Absolute),
+        Opcode::new(0x1D, "ORA", 3, 4, AddressMode::AbsoluteX),
+        Opcode::new(0x19, "ORA", 3, 4, AddressMode::AbsoluteY),
+        Opcode::new(0x01, "ORA", 2, 6, AddressMode::IndirectX),
+        Opcode::new(0x11, "ORA", 2, 5, AddressMode::IndirectY),
+
         Opcode::new(0x0A, "ASL", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0x06, "ASL", 2, 5, AddressMode::ZeroPage),
         Opcode::new(0x16, "ASL", 2, 6, AddressMode::ZeroPageX),
@@ -130,8 +140,10 @@ lazy_static! {
         Opcode::new(0xF1, "SBC", 2, 5, AddressMode::IndirectY),
 
         Opcode::new(0x08, "PHP", 1, 3, AddressMode::NoneAddressing),
-
         Opcode::new(0x28, "PLP", 1, 4, AddressMode::NoneAddressing),
+
+        Opcode::new(0x48, "PHA", 1, 3, AddressMode::NoneAddressing),
+        Opcode::new(0x68, "PLA", 1, 4, AddressMode::NoneAddressing),
 
         Opcode::new(0x90, "BCC", 2, 2, AddressMode::NoneAddressing),
         Opcode::new(0xB0, "BCS", 2, 2, AddressMode::NoneAddressing),
@@ -185,6 +197,8 @@ lazy_static! {
 
         Opcode::new(0x20, "JSR", 3, 6, AddressMode::Absolute),
         Opcode::new(0x60, "RTS", 1, 6, AddressMode::NoneAddressing),
+
+        Opcode::new(0x40, "RTI", 1, 6, AddressMode::NoneAddressing),
 
         Opcode::new(0x38, "SEC", 1, 2, AddressMode::NoneAddressing),
         Opcode::new(0xF8, "SED", 1, 2, AddressMode::NoneAddressing),
