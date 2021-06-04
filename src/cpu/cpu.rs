@@ -360,8 +360,8 @@ impl CPU {
 
     fn branch(&mut self, flag: bool) {
         if flag {
-            let offset = self.mem.read(self.pc) as u16;
-            let dst = self.pc.wrapping_add(1).wrapping_add(offset);
+            let offset = self.mem.read(self.pc) as i8;  // offset can be negative
+            let dst = self.pc.wrapping_add(1).wrapping_add(offset as u16);
             self.pc = dst;
         }
     }
