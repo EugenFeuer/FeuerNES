@@ -277,7 +277,7 @@ impl CPU {
     }
 
     fn ror_acc(&mut self) {
-        let res = (self.acc >> 1) | ((0x01 & self.status.bits()) << 7);
+        let res = (self.acc >> 1) | (self.status.bits() << 7);
 
         self.update_carry_flag(self.acc & 0x01 == 1);
         self.update_zero_flag(res);
@@ -289,7 +289,7 @@ impl CPU {
     fn ror(&mut self, mode: &AddressMode) {
         let addr = self.get_operand_address(mode);
         let value = self.mem.read(addr);
-        let res = (value >> 1) | ((0x01 & self.status.bits()) << 7);
+        let res = (value >> 1) | (self.status.bits() << 7);
 
         self.update_carry_flag(value & 0x01 == 1);
         self.update_zero_flag(res);
@@ -312,7 +312,7 @@ impl CPU {
         let value = self.mem.read(addr);
         let res = value >> 1;
         
-        self.update_carry_flag(value & 0xFE == 1);
+        self.update_carry_flag(value & 0x01 == 1);
         self.update_zero_flag(res);
         self.update_neg_flag(res);
         self.mem.write(addr, res);
@@ -410,7 +410,7 @@ impl CPU {
         let value = self.mem.read(addr);
 
         self.update_neg_flag(value);
-        self.update_overflow_flag(value >> 6 == 1);
+        self.update_overflow_flag(value & 0b0100_0000 == 1);
         self.update_zero_flag(self.acc & value);
     }
 
@@ -525,7 +525,9 @@ impl CPU {
 
     fn php(&mut self) {
         let mut s = self.status.clone();
+        // http://wiki.nesdev.com/w/index.php/Status_flags#The_B_flag
         s.insert(CPUStatus::BREAK);
+        s.insert(CPUStatus::UNUSED);
         self.stack_push(s.bits());
     }
 
