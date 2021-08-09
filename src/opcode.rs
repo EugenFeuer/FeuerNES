@@ -1,6 +1,7 @@
 ﻿use crate::cpu::AddressMode;
 use std::collections::HashMap;
 
+#[derive(Copy, Clone)]
 pub struct Opcode {
     pub op: u8,
     pub name: &'static str,
