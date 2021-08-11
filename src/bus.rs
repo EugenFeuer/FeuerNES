@@ -4,18 +4,21 @@ use crate::cartridge;
 const RAM_BEGIN: u16 = 0x0000;
 const RAM_END:   u16 = 0x1FFF;
 
-const PPU_BEGIN: u16 = 0x2000;
-const PPU_END:   u16 = 0x3FFF;
+const CHR_BEGIN: u16 = 0x2000;
+const CHR_END: u16 = 0x3FFF;
+
+const PRG_BEGIN: u16 = 0x8000;
+const PRG_END: u16 = 0xFFFF;
 
 pub struct Bus {
-    ram: [u8; 2000],
+    ram: [u8; 0x800],
     cartridge: cartridge::Cartridge,
 }
 
 impl Bus {
     pub fn new(cartridge: cartridge::Cartridge) -> Self {
         Bus {
-            ram: [0; 2000],
+            ram: [0; 0x800],
             cartridge: cartridge
         }
     }
@@ -36,11 +39,15 @@ impl mem::Memory for Bus {
             RAM_BEGIN ..= RAM_END => {
                 // reading cpu ram
             }
-            PPU_BEGIN ..= PPU_END => {
+            CHR_BEGIN ..= CHR_END => {
                 // reading ppu
             }
+            PRG_BEGIN ..= PRG_END => {
+                // reading prg rom
+                return self.read_prg_rom(addr);
+            }
             _ => {
-                println!("not impl");
+                println!("ignore reading memory from: {:#02X}, return 0", addr);
                 return 0;
             }
         }
@@ -48,9 +55,20 @@ impl mem::Memory for Bus {
         0
     }
     fn mem_write(&mut self, addr: u16, data: u8) {
-        // TODO
-        // match addr {
-
-        // }
+        match addr {
+            RAM_BEGIN ..= RAM_END => {
+                // writing cpu ram
+                self.ram[addr as usize] = data;
+            }
+            CHR_BEGIN ..= CHR_END => {
+                // writing ppu
+            }
+            PRG_BEGIN ..= PRG_END => {
+                panic!("cannot write to PRG ROM!");
+            }
+            _ => {
+                println!("ignore writing memory to: {:#02X}", addr);
+            }
+        }
     }
 }

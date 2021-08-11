@@ -3,6 +3,7 @@ mod bus;
 mod cpu;
 mod opcode;
 mod cartridge;
+mod trace;
 
 #[macro_use]
 extern crate lazy_static;
@@ -102,9 +103,10 @@ fn main() {
 
     let mut screen = [0u8; 32 * 32 * 3];
     let mut rng = rand::thread_rng();
-
+    let mut frame : u32 = 0;
     cpu.reset();
     cpu.interprect_with_callback(move |cpu| {
+        trace::trace(cpu, &frame);
         input(cpu, &mut event_pump);
         cpu.bus.mem_write(0x00FE, rng.gen_range(1, 16));
         if render(cpu, &mut screen) {
@@ -114,6 +116,7 @@ fn main() {
         }
 
         ::std::thread::sleep(std::time::Duration::new(0, 70000));
+        frame += 1;
     });
 
     println!("Hello, NES!");

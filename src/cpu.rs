@@ -6,7 +6,6 @@ use crate::mem::Memory;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-const PROGRAM_BEGIN_LOC: u16 = 0x8000;
 const RESET_INTERRUPT_MEM_LOC: u16 = 0xFFFC;
 
 const STACK_BOTTOM_LOC: u16 = 0x0100;
@@ -57,12 +56,12 @@ bitflags::bitflags! {
 }
 
 pub struct CPU {
-    pc: u16,
-    sp: u8,
-    acc: u8,
-    rx: u8,
-    ry: u8,
-    status: CPUStatus,
+    pub pc: u16,
+    pub sp: u8,
+    pub acc: u8,
+    pub rx: u8,
+    pub ry: u8,
+    pub status: CPUStatus,
     pub bus: Bus,
 
     history: Vec<opcode::Opcode>,
@@ -76,6 +75,14 @@ impl Memory for CPU {
 
     fn mem_write(&mut self, addr: u16, data: u8) {
         self.bus.mem_write(addr, data);
+    }
+
+    fn mem_read_u16(&self, addr: u16) -> u16 {
+        self.bus.mem_read_u16(addr)
+    }
+
+    fn mem_write_u16(&mut self, addr: u16, data: u16) {
+        self.bus.mem_write_u16(addr, data);
     }
 }
 
@@ -126,49 +133,57 @@ impl CPU {
         self.sp = STACK_RESET_LOC;
     }
 
-    fn get_operand_address(&self, mode: &AddressMode) -> u16 {
+    pub fn get_absolute_address(&self, mode: &AddressMode, addr: u16) -> u16 {
         match mode {
-            AddressMode::Immediate => {
-                self.pc
-            }
             AddressMode::ZeroPage => {
-                self.bus.mem_read(self.pc) as u16
+                self.bus.mem_read(addr) as u16
             }
             AddressMode::ZeroPageX => {
-                let pos = self.bus.mem_read(self.pc);
+                let pos = self.bus.mem_read(addr);
                 pos.wrapping_add(self.rx) as u16
             }
             AddressMode::ZeroPageY => {
-                let pos = self.bus.mem_read(self.pc);
+                let pos = self.bus.mem_read(addr);
                 pos.wrapping_add(self.ry) as u16
             }
             AddressMode::Absolute => {
-                self.bus.mem_read_u16(self.pc)
+                self.bus.mem_read_u16(addr)
             }
             AddressMode::AbsoluteX => {
-                let pos = self.bus.mem_read_u16(self.pc);
+                let pos = self.bus.mem_read_u16(addr);
                 pos.wrapping_add(self.rx as u16) as u16
             }
             AddressMode::AbsoluteY => {
-                let pos = self.bus.mem_read_u16(self.pc);
+                let pos = self.bus.mem_read_u16(addr);
                 pos.wrapping_add(self.ry as u16) as u16
             }
             AddressMode::IndirectX => {
-                let base = self.bus.mem_read(self.pc);
+                let base = self.bus.mem_read(addr);
                 let ptr = (base as u8).wrapping_add(self.rx) as u8;
                 let lo = self.bus.mem_read(ptr as u16);
                 let hi = self.bus.mem_read(ptr.wrapping_add(1) as u16);
                 (hi as u16) << 8 | (lo as u16)
             }
             AddressMode::IndirectY => {
-                let base = self.bus.mem_read(self.pc);
+                let base = self.bus.mem_read(addr);
                 let lo = self.bus.mem_read(base as u16);
                 let hi = self.bus.mem_read(base.wrapping_add(1) as u16);
                 let deref_base = (hi as u16) << 8 | (lo as u16);
                 deref_base.wrapping_add(self.ry as u16)
             }
-            AddressMode::NoneAddressing => {
+            _ => {
                 panic!("not support for {:?}", mode)
+            }
+        }
+    }
+
+    pub fn get_operand_address(&self, mode: &AddressMode) -> u16 {
+        match mode {
+            AddressMode::Immediate => {
+                self.pc
+            }
+            _ => {
+                self.get_absolute_address(mode, self.pc)
             }
         }
     }
@@ -657,6 +672,8 @@ impl CPU {
     pub fn interprect_with_callback<T>(&mut self, mut callback: T) where T: FnMut(&mut CPU) -> () {
         let ref opcodes: HashMap<u8, &'static opcode::Opcode> = *opcode::OPCODES_MAP;
         loop {
+            callback(self);
+
             let op = self.bus.mem_read(self.pc);
             self.pc += 1;
             let pc_state = self.pc;
@@ -912,8 +929,6 @@ impl CPU {
             if pc_state == self.pc {
                 self.pc += (code.bytes - 1) as u16
             }
-
-            callback(self);
         }
     }
 }
