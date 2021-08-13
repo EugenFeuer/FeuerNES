@@ -11,14 +11,14 @@ const PRG_BEGIN: u16 = 0x8000;
 const PRG_END: u16 = 0xFFFF;
 
 pub struct Bus {
-    ram: [u8; 0x800],
+    ram: [u8; 0x2000],
     cartridge: cartridge::Cartridge,
 }
 
 impl Bus {
     pub fn new(cartridge: cartridge::Cartridge) -> Self {
         Bus {
-            ram: [0; 0x800],
+            ram: [0; 0x2000],
             cartridge: cartridge
         }
     }
@@ -37,7 +37,7 @@ impl mem::Memory for Bus {
     fn mem_read(&self, addr: u16) -> u8 {
         match addr {
             RAM_BEGIN ..= RAM_END => {
-                // reading cpu ram
+                return self.ram[addr as usize];
             }
             CHR_BEGIN ..= CHR_END => {
                 // reading ppu

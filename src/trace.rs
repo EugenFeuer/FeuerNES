@@ -37,7 +37,7 @@ impl TraceInfo {
 
     pub fn dump(self: Self) -> String {
         format!(
-            "{} {} {} {} {} {} {} {:o}",
+            "{} {:#02X} {} {} {} {} {} {:o}",
             self.frame, self.pc, self.opcode.name, self.sp, self.acc, self.rx, self.ry, self.status
         )
     }
@@ -59,7 +59,8 @@ pub fn trace(cpu: &cpu::CPU, frame: &u32) {
             (_addr, _value)
         }
     };
-
+    use web_sys::console;
+    // console::log_1(&format!("frame: {}", trace_info.dump()).into());
     // println!("{}", trace_info.dump());
 
     println!("PC: {:#02X}, INSTRUCT: {}", _pc, instruction.name);

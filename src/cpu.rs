@@ -671,7 +671,7 @@ impl CPU {
 
     pub fn interprect_with_callback<T>(&mut self, mut callback: T) where T: FnMut(&mut CPU) -> () {
         let ref opcodes: HashMap<u8, &'static opcode::Opcode> = *opcode::OPCODES_MAP;
-        loop {
+        // loop {
             callback(self);
 
             let op = self.bus.mem_read(self.pc);
@@ -684,8 +684,9 @@ impl CPU {
 
             match op {
                 0x00 => {
+                    self.reset();
                     // println!("{:?}", self.codes);
-                    return;
+                    // return;
                     // self.brk();
                 }
                 // NOP
@@ -929,7 +930,7 @@ impl CPU {
             if pc_state == self.pc {
                 self.pc += (code.bytes - 1) as u16
             }
-        }
+        // }
     }
 }
 
