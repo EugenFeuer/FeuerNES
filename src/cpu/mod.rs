@@ -1,6 +1,15 @@
-﻿mod instrutions;
+﻿mod instructions;
 
-use self::instrutions::*;
+use instructions::*;
+use instructions::common::*;
+use instructions::bitwise::*;
+use instructions::branch::*;
+use instructions::compare::*;
+use instructions::jump::*;
+use instructions::memory::*;
+use instructions::stack::*;
+use instructions::status::*;
+use instructions::transfer::*;
 
 use crate::opcode;
 use crate::bus::Bus;
