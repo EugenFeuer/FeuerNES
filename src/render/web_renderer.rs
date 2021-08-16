@@ -160,7 +160,7 @@ fn render(cpu: &cpu::CPU) -> Vec<u8> {
 }
 
 fn init_cpu() -> cpu::CPU {
-    let bytes = include_bytes!("../res/snake.nes");
+    let bytes = include_bytes!("../../res/snake.nes");
     let cartridge = cartridge::Cartridge::new(&bytes.to_vec()).unwrap();
     let bus = bus::Bus::new(cartridge);
     let cpu = cpu::CPU::new(bus);
@@ -247,8 +247,8 @@ impl Screen {
         self._screen_buffers = Some(ScreenBufferData::new(Some(vbo), Some(ibo)));
 
         // Shaders
-        let vs = self.init_shader(GL::VERTEX_SHADER, include_str!("../res/screen.vs")).expect("create vs error");
-        let fs = self.init_shader(GL::FRAGMENT_SHADER, include_str!("../res/screen.fs")).expect("create fs error");
+        let vs = self.init_shader(GL::VERTEX_SHADER, include_str!("../../res/screen.vs")).expect("create vs error");
+        let fs = self.init_shader(GL::FRAGMENT_SHADER, include_str!("../../res/screen.fs")).expect("create fs error");
 
         let program = gl.create_program().expect("create program error");
         gl.attach_shader(&program, &vs);
