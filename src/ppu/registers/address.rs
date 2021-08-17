@@ -24,13 +24,21 @@ impl PPUADDR {
         } else {
             self.vram_addr |= addr as u16;
         }
+        self.write_hi = !self.write_hi;
 
-        // mirror down
+        self.mirror_down();
+    }
+
+    pub fn increment_address(&mut self, inc: u8) {
+        self.vram_addr.wrapping_add(inc as u16);
+
+        self.mirror_down();
+    }
+
+    fn mirror_down(&mut self) {
         if self.vram_addr > 0x3FFF {
             self.vram_addr &= 0x3FFF;
         }
-
-        self.write_hi = !self.write_hi;
     }
 
     pub fn reset_latch(&mut self) {
