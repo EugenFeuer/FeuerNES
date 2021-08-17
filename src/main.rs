@@ -1,6 +1,7 @@
 mod mem;
 mod bus;
 mod cpu;
+mod ppu;
 mod opcode;
 mod cartridge;
 mod trace;
