@@ -4,8 +4,8 @@ use crate::cartridge;
 const RAM_BEGIN: u16 = 0x0000;
 const RAM_END:   u16 = 0x1FFF;
 
-const CHR_BEGIN: u16 = 0x2000;
-const CHR_END: u16 = 0x3FFF;
+const PPU_REG_MIRROR_BEGIN: u16 = 0x2008;  // 0x2000-0x2007 is ppu registers, mirror to it
+const PPU_REG_MIRROR_END  : u16 = 0x3FFF;
 
 const PRG_BEGIN: u16 = 0x8000;
 const PRG_END: u16 = 0xFFFF;
