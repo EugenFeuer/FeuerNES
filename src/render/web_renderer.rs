@@ -55,7 +55,7 @@ impl ScreenProgramData {
     }
 }
 
-pub struct Screen {
+pub struct Screen{
     cpu: cpu::CPU,
     frame: u32,
 
@@ -138,7 +138,7 @@ fn byte_to_color(byte: u8) -> (u8, u8, u8, u8) {
     }
 }
 
-fn render(cpu: &cpu::CPU) -> Vec<u8> {
+fn render(cpu: &mut cpu::CPU) -> Vec<u8> {
     let mut frame = vec![0u8; 32 * 32 * 4];
     let mut frame_idx = 0;
     for i in 0x200..0x600 {
@@ -320,7 +320,8 @@ impl Screen {
         // console::log_1(&format!("frame: {}", frame).into());
         self.frame += 1;
 
-        self.update_texture(32, 32, render(&self.cpu));
+        let bytes = render(&mut self.cpu);
+        self.update_texture(32, 32, bytes);
 
         let handle = {
             let link = self.link.clone();
