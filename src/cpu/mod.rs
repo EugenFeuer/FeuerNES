@@ -63,7 +63,7 @@ bitflags::bitflags! {
     }
 }
 
-pub struct CPU {
+pub struct CPU{
     pub pc: u16,
     pub sp: u8,
     pub acc: u8,
@@ -76,8 +76,8 @@ pub struct CPU {
     codes: HashSet<String>
 }
 
-impl Memory for CPU {
-    fn mem_read(&self, addr: u16) -> u8 {
+impl  Memory for CPU {
+    fn mem_read(&mut self, addr: u16) -> u8 {
         self.bus.mem_read(addr)
     }    
 
@@ -85,7 +85,7 @@ impl Memory for CPU {
         self.bus.mem_write(addr, data);
     }
 
-    fn mem_read_u16(&self, addr: u16) -> u16 {
+    fn mem_read_u16(&mut self, addr: u16) -> u16 {
         self.bus.mem_read_u16(addr)
     }
 
@@ -98,7 +98,7 @@ pub trait With<T> {
     fn with(value: T) -> Self;
 }
 
-impl With<Vec<u8>> for CPU {
+impl  With<Vec<u8>> for CPU {
     fn with(value: Vec<u8>) -> Self {
         CPU {
             pc: 0,
@@ -115,7 +115,7 @@ impl With<Vec<u8>> for CPU {
     }
 }
 
-impl CPU {
+impl CPU{
     pub fn new(bus: Bus) -> Self {
         CPU {
             pc: 0,
@@ -141,7 +141,7 @@ impl CPU {
         self.sp = STACK_RESET_LOC;
     }
 
-    pub fn get_absolute_address(&self, mode: &AddressMode, addr: u16) -> u16 {
+    pub fn get_absolute_address(&mut self, mode: &AddressMode, addr: u16) -> u16 {
         match mode {
             AddressMode::ZeroPage => {
                 self.mem_read(addr) as u16
@@ -185,7 +185,7 @@ impl CPU {
         }
     }
 
-    pub fn get_operand_address(&self, mode: &AddressMode) -> u16 {
+    pub fn get_operand_address(&mut self, mode: &AddressMode) -> u16 {
         match mode {
             AddressMode::Immediate => {
                 self.pc
@@ -214,7 +214,7 @@ impl CPU {
             self.pc += 1;
             let pc_state = self.pc;
 
-            let code = opcodes.get(&op).expect(&format!("op: {:x} not exists or not impl.", op));
+            let code = opcodes.get(&op).expect(&format!("op: {:x} not exists or not impl .", op));
             // self.history.push(**code);
             self.codes.insert(String::from(code.name));
 

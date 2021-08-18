@@ -33,8 +33,8 @@ impl Bus {
     }
 }
 
-impl mem::Memory for Bus {
-    fn mem_read(&self, addr: u16) -> u8 {
+impl  mem::Memory for Bus {
+    fn mem_read(&mut self, addr: u16) -> u8 {
         match addr {
             RAM_BEGIN ..= RAM_END => {
                 return self.ram[addr as usize];

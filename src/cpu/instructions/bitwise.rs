@@ -6,7 +6,8 @@ use crate::mem::Memory;
 
 pub fn adc(cpu: &mut CPU, mode: &AddressMode) {
     let addr = cpu.get_operand_address(mode);
-    add_to_acc(cpu, cpu.mem_read(addr));
+    let data = cpu.mem_read(addr);
+    add_to_acc(cpu, data);
 }
 
 pub fn and(cpu: &mut CPU, mode: &AddressMode) {
