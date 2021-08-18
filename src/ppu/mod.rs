@@ -10,7 +10,17 @@ use self::registers::scroll::*;
 use self::registers::address::*;
 use self::registers::data::*;
 
-pub struct PPU {
+pub const PPU_REG_CTRL   : u16 = 0x2000;
+pub const PPU_REG_MASK   : u16 = 0x2001;
+pub const PPU_REG_STATUS : u16 = 0x2002;
+pub const PPU_REG_OAMADDR: u16 = 0x2003;
+pub const PPU_REG_OAMDATA: u16 = 0x2004;
+pub const PPU_REG_SCROLL : u16 = 0x2005;
+pub const PPU_REG_ADDR   : u16 = 0x2006;
+pub const PPU_REG_DATA   : u16 = 0x2007;
+pub const PPU_REG_OAMDMA : u16 = 0x4014;
+
+pub struct PPU{
     pub chr: Vec<u8>,
     pub palette: [u8; 32],
     pub vram: [u8; 2048],
