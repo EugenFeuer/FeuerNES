@@ -18,6 +18,10 @@ impl PPUADDR {
         }
     }
 
+    pub fn get_address(&self) -> u16 {
+        self.vram_addr
+    }
+
     pub fn write_address(&mut self, addr: u8) {
         if self.write_hi {
             self.vram_addr = (addr as u16) << 8;
