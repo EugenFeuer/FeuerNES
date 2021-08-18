@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://wiki.nesdev.com/w/index.php/PPU_registers
     Common Name	Address	Bits	    Notes
     PPUCTRL	    $2000	VPHB SINN	NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
@@ -12,16 +12,18 @@ https://wiki.nesdev.com/w/index.php/PPU_registers
     OAMDMA	    $4014	aaaa aaaa	OAM DMA high address
 */
 
+pub mod address;
 pub mod controller;
+pub mod data;
 pub mod mask;
-pub mod status;
 pub mod oam_address;
 pub mod oam_data;
 pub mod scroll;
-pub mod address;
-pub mod data;
+pub mod status;
 
 pub trait BitwiseRegister {
     fn update_bits(&mut self, bits: u8) {}
-    fn get_bits(&self) -> u8 { 0 }
+    fn get_bits(&self) -> u8 {
+        0
+    }
 }

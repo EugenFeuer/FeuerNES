@@ -1,6 +1,6 @@
-﻿use super::common::*;
-use super::super::CPU;
 use super::super::CPUStatus;
+use super::super::CPU;
+use super::common::*;
 
 pub fn php(cpu: &mut CPU) {
     let mut s = cpu.status.clone();
@@ -31,5 +31,4 @@ mod test {
     use super::*;
     use crate::cpu::CPUStatus;
     use crate::cpu::With;
-
 }

@@ -1,11 +1,11 @@
-mod mem;
 mod bus;
-mod cpu;
-mod ppu;
-mod opcode;
 mod cartridge;
-mod trace;
+mod cpu;
+mod mem;
+mod opcode;
+mod ppu;
 mod render;
+mod trace;
 
 #[macro_use]
 extern crate lazy_static;

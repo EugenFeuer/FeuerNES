@@ -1,7 +1,7 @@
-﻿use super::common::*;
-use super::super::CPU;
-use super::super::CPUStatus;
 use super::super::AddressMode;
+use super::super::CPUStatus;
+use super::super::CPU;
+use super::common::*;
 
 use crate::mem::Memory;
 
@@ -26,7 +26,7 @@ pub fn sec(cpu: &mut CPU) {
 }
 
 pub fn sed(cpu: &mut CPU) {
-    cpu.status.insert(CPUStatus::DECIMAL);   
+    cpu.status.insert(CPUStatus::DECIMAL);
 }
 
 pub fn sei(cpu: &mut CPU) {
@@ -47,5 +47,4 @@ mod test {
     use super::*;
     use crate::cpu::CPUStatus;
     use crate::cpu::With;
-
 }

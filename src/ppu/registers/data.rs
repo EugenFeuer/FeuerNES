@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUDATA
     Data ($2007) <> read/write
     Common name: PPUDATA
@@ -6,14 +6,12 @@ https://wiki.nesdev.com/w/index.php/PPU_registers#PPUDATA
     Access: read, write
 */
 pub struct PPUDATA {
-    data: u8
+    data: u8,
 }
 
 impl PPUDATA {
     pub fn new() -> Self {
-        PPUDATA {
-            data: 0
-        }
+        PPUDATA { data: 0 }
     }
 
     pub fn write_data(&mut self, data: u8) {

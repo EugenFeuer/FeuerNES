@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUSCROLL
     Scroll ($2005) >> write x2
     Common name: PPUSCROLL
@@ -9,7 +9,7 @@ https://wiki.nesdev.com/w/index.php/PPU_registers#PPUSCROLL
 pub struct PPUSCROLL {
     cam_position_x: u8,
     cam_position_y: u8,
-    latch: bool
+    latch: bool,
 }
 
 impl PPUSCROLL {
@@ -17,7 +17,7 @@ impl PPUSCROLL {
         PPUSCROLL {
             cam_position_x: 0,
             cam_position_y: 0,
-            latch: true
+            latch: true,
         }
     }
 

@@ -1,4 +1,4 @@
-﻿pub mod common;
+pub mod common;
 
 pub mod bitwise;
 pub mod branch;

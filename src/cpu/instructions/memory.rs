@@ -1,9 +1,8 @@
-﻿use super::common::*;
-use super::super::CPU;
 use super::super::AddressMode;
+use super::super::CPU;
+use super::common::*;
 
 use crate::mem::Memory;
-
 
 pub fn dec(cpu: &mut CPU, mode: &AddressMode) {
     let addr = cpu.get_operand_address(mode);
@@ -47,5 +46,4 @@ mod test {
     use super::*;
     use crate::cpu::CPUStatus;
     use crate::cpu::With;
-
 }

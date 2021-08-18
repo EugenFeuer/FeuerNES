@@ -1,4 +1,4 @@
-﻿/*
+/*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUADDR
     Address ($2006) >> write x2
     Common name: PPUADDR
@@ -7,14 +7,14 @@ https://wiki.nesdev.com/w/index.php/PPU_registers#PPUADDR
 */
 pub struct PPUADDR {
     vram_addr: u16,
-    write_hi: bool
+    write_hi: bool,
 }
 
 impl PPUADDR {
     pub fn new() -> Self {
         PPUADDR {
             vram_addr: 0,
-            write_hi: true
+            write_hi: true,
         }
     }
 

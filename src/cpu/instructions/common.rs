@@ -1,5 +1,5 @@
-﻿use super::super::CPU;
 use super::super::CPUStatus;
+use super::super::CPU;
 use crate::mem::Memory;
 
 pub const RESET_INTERRUPT_MEM_LOC: u16 = 0xFFFC;
@@ -52,8 +52,8 @@ pub fn stack_pop(cpu: &mut CPU) -> u8 {
 }
 
 pub fn stack_push_u16(cpu: &mut CPU, value: u16) {
-    stack_push(cpu, (value >> 8) as u8);    // hi
-    stack_push(cpu, value as u8);           // lo
+    stack_push(cpu, (value >> 8) as u8); // hi
+    stack_push(cpu, value as u8); // lo
 }
 
 pub fn stack_pop_u16(cpu: &mut CPU) -> u16 {
@@ -74,7 +74,7 @@ pub fn compare(cpu: &mut CPU, v1: u8, v2: u8) {
 /* branch */
 pub fn branch(cpu: &mut CPU, flag: bool) {
     if flag {
-        let offset = cpu.mem_read(cpu.pc) as i8;  // offset can be negative
+        let offset = cpu.mem_read(cpu.pc) as i8; // offset can be negative
         let dst = cpu.pc.wrapping_add(1).wrapping_add(offset as u16);
         cpu.pc = dst;
     }
@@ -89,9 +89,7 @@ pub fn add_to_acc(cpu: &mut CPU, data: u8) {
     };
 
     // A = A + M + C
-    let sum = cpu.acc as u16 +
-                data     as u16 +
-                cur_carry;
+    let sum = cpu.acc as u16 + data as u16 + cur_carry;
 
     // update flags
     update_carry_flag(cpu, sum > 0xFF);
@@ -108,5 +106,4 @@ mod test {
     use super::*;
     use crate::cpu::CPUStatus;
     use crate::cpu::With;
-    
 }

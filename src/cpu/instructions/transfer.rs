@@ -1,6 +1,6 @@
-﻿use super::common::*;
-use super::super::CPU;
 use super::super::AddressMode;
+use super::super::CPU;
+use super::common::*;
 
 use crate::mem::Memory;
 
@@ -107,11 +107,8 @@ mod test {
     /* test for TRANSFER */
     #[test]
     fn test_tax() {
-        
-        let program = vec!(
-            0x69, 0x10, 0xAA, 0x00
-        );
-        
+        let program = vec![0x69, 0x10, 0xAA, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.run();
 
@@ -120,11 +117,8 @@ mod test {
 
     #[test]
     fn test_tay() {
-        
-        let program = vec!(
-            0x69, 0x10, 0xA8, 0x00
-        );
-        
+        let program = vec![0x69, 0x10, 0xA8, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.run();
 
@@ -133,11 +127,8 @@ mod test {
 
     #[test]
     fn test_txa() {
-        
-        let program = vec!(
-            0x8A, 0x00
-        );
-        
+        let program = vec![0x8A, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.reset();
         cpu.rx = 0x10;
@@ -148,11 +139,8 @@ mod test {
 
     #[test]
     fn test_tya() {
-        
-        let program = vec!(
-            0x98, 0x00
-        );
-        
+        let program = vec![0x98, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.reset();
         cpu.ry = 0x10;
@@ -163,11 +151,8 @@ mod test {
 
     #[test]
     fn test_tsx() {
-        
-        let program = vec!(
-            0xBA, 0x00
-        );
-        
+        let program = vec![0xBA, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.reset();
         cpu.sp = 0x10;
@@ -178,11 +163,8 @@ mod test {
 
     #[test]
     fn test_txs() {
-        
-        let program = vec!(
-            0x9A, 0x00
-        );
-        
+        let program = vec![0x9A, 0x00];
+
         let mut cpu = CPU::with(program.to_vec());
         cpu.reset();
         cpu.rx = 0x10;

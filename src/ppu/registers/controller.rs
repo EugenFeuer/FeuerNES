@@ -1,4 +1,4 @@
-﻿use super::BitwiseRegister;
+use super::BitwiseRegister;
 
 /*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUCTRL
@@ -49,7 +49,7 @@ impl PPUCTRL {
             0b01 => 0x2400,
             0b10 => 0x2800,
             0b11 => 0x2C00,
-            _ => panic!("error")
+            _ => panic!("error"),
         }
     }
 
@@ -86,11 +86,11 @@ impl PPUCTRL {
     }
 
     pub fn get_master_slave_select(&self) -> bool {
-        self.contains(PPUCTRL::MASTER_SLAVE_SEL) 
+        self.contains(PPUCTRL::MASTER_SLAVE_SEL)
     }
 
     pub fn get_generate_nmi(&self) -> bool {
-        self.contains(PPUCTRL::GEN_NMI_VBI) 
+        self.contains(PPUCTRL::GEN_NMI_VBI)
     }
 }
 

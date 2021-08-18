@@ -1,12 +1,12 @@
-﻿use super::common::*;
-use super::super::CPU;
-use super::super::CPUStatus;
 use super::super::AddressMode;
+use super::super::CPUStatus;
+use super::super::CPU;
+use super::common::*;
 
 use crate::mem::Memory;
 
 pub fn jsr(cpu: &mut CPU, mode: &AddressMode) {
-    stack_push_u16(cpu, cpu.pc + 1);   // PC + 2 - 1
+    stack_push_u16(cpu, cpu.pc + 1); // PC + 2 - 1
     let addr = cpu.get_operand_address(mode);
     cpu.pc = addr;
 }
@@ -35,5 +35,4 @@ mod test {
     use super::*;
     use crate::cpu::CPUStatus;
     use crate::cpu::With;
-
 }

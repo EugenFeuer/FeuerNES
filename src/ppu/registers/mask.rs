@@ -1,4 +1,4 @@
-﻿use super::BitwiseRegister;
+use super::BitwiseRegister;
 
 /*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUMASK

@@ -1,4 +1,4 @@
-﻿use super::BitwiseRegister;
+use super::BitwiseRegister;
 
 /*
 https://wiki.nesdev.com/w/index.php/PPU_registers#PPUSTATUS
@@ -47,7 +47,7 @@ impl PPUSTATUS {
     pub fn new() -> Self {
         PPUSTATUS::from_bits_truncate(0b0000_0000)
     }
-    
+
     pub fn set_sprite_overflow(&mut self, flag: bool) {
         self.set(PPUSTATUS::SPR_OVERFLOW, flag);
     }
@@ -70,7 +70,7 @@ impl PPUSTATUS {
 }
 
 impl BitwiseRegister for PPUSTATUS {
-    fn get_bits(&self) -> u8{
+    fn get_bits(&self) -> u8 {
         self.bits
     }
 }
