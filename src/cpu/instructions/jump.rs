@@ -22,10 +22,15 @@ pub fn rti(cpu: &mut CPU) {
 }
 
 pub fn brk(cpu: &mut CPU) {
+    let mut status = cpu.status.clone();
+    status.insert(CPUStatus::BREAK);
+    status.insert(CPUStatus::RESERVED);
+
     stack_push_u16(cpu, cpu.pc);
-    stack_push(cpu, cpu.status.bits());
+    stack_push(cpu, status.bits);
+
+    cpu.status.insert(CPUStatus::INTERRUPT_DISABLE);
     cpu.pc = cpu.mem_read_u16(RESET_INTERRUPT_MEM_LOC);
-    cpu.status.insert(CPUStatus::BREAK);
 }
 
 // TODO: jmp

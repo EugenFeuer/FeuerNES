@@ -6,7 +6,7 @@ pub fn php(cpu: &mut CPU) {
     let mut s = cpu.status.clone();
     // http://wiki.nesdev.com/w/index.php/Status_flags#The_B_flag
     s.insert(CPUStatus::BREAK);
-    s.insert(CPUStatus::UNUSED);
+    s.insert(CPUStatus::RESERVED);
     stack_push(cpu, s.bits());
 }
 
