@@ -20,6 +20,10 @@ pub const PPU_REG_ADDR: u16 = 0x2006;
 pub const PPU_REG_DATA: u16 = 0x2007;
 pub const PPU_REG_OAMDMA: u16 = 0x4014;
 
+const SCANLINE_CYCLES_COST: u16 = 341;
+const SCANLINE_TRIGGER_NMI: u16 = 241;
+const SCANLINE_PER_FRAME: u16 = 262;
+
 pub struct PPU {
     pub chr: Vec<u8>,
     pub palette: [u8; 32],
@@ -37,7 +41,10 @@ pub struct PPU {
     pub address_register: PPUADDR,
     pub data_register: PPUDATA,
 
-    _internal_last_read_byte: u8,
+    cycles: u16,
+    scanlines: u16,
+    should_nmi_flag: bool,
+    internal_last_read_byte: u8,
 }
 
 impl PPU {
@@ -58,7 +65,10 @@ impl PPU {
             address_register: PPUADDR::new(),
             data_register: PPUDATA::new(),
 
-            _internal_last_read_byte: 0,
+            cycles: 0,
+            scanlines: 0,
+            should_nmi_flag: false,
+            internal_last_read_byte: 0,
         }
     }
 
@@ -69,12 +79,12 @@ impl PPU {
 
         match addr {
             0x0000..=0x1FFF => {
-                self._internal_last_read_byte = self.chr[addr as usize];
-                self._internal_last_read_byte
+                self.internal_last_read_byte = self.chr[addr as usize];
+                self.internal_last_read_byte
             }
             0x2000..=0x2FFF => {
-                self._internal_last_read_byte = self.vram[(addr - 0x2000) as usize];
-                self._internal_last_read_byte
+                self.internal_last_read_byte = self.vram[(addr - 0x2000) as usize];
+                self.internal_last_read_byte
             }
             0x3000..=0x3EFF => panic!("not used"),
             0x3F00..=0x3FFF => self.palette[(addr - 0x3F00) as usize],
@@ -112,5 +122,38 @@ impl PPU {
             (MirroringType::Horizontal, 3) => addr - 0x800, // 0x400-0x800
             _ => addr,                                      // no need to map
         }
+    }
+
+    pub fn tick(&mut self, cycles: u16) {
+        self.cycles += cycles;
+
+        if self.cycles >= SCANLINE_CYCLES_COST {
+            self.cycles -= SCANLINE_CYCLES_COST;
+            self.scanlines += 1;
+
+            if self.scanlines == SCANLINE_TRIGGER_NMI {
+                self.status_register.set_vertical_blank(true);
+                self.status_register.set_sprite_zero_hit(false);
+
+                if self.ctrl_register.get_generate_nmi() {
+                    self.should_nmi_flag = true;
+                }
+            }
+
+            if self.scanlines >= SCANLINE_PER_FRAME {
+                self.scanlines = 0;
+                self.should_nmi_flag = false;
+                self.status_register.set_sprite_zero_hit(false);
+                self.status_register.set_vertical_blank(false);
+            }
+        }
+    }
+
+    pub fn should_nmi(&mut self) -> bool {
+        if self.should_nmi_flag {
+            self.should_nmi_flag = false;
+            return true;
+        }
+        return false;
     }
 }

@@ -63,10 +63,6 @@ impl PPUSTATUS {
     pub fn set_vertical_blank(&mut self, flag: bool) {
         self.set(PPUSTATUS::VBLANK, flag);
     }
-
-    pub fn reset_vertical_blank(&mut self) {
-        self.remove(PPUSTATUS::VBLANK);
-    }
 }
 
 impl BitwiseRegister for PPUSTATUS {

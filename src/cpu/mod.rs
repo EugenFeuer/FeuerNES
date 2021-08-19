@@ -19,6 +19,8 @@ use crate::opcode;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
+const NMI_HANDLER_ADDR: u16 = 0xFFFA;
+
 #[derive(Debug, Copy, Clone)]
 pub enum AddressMode {
     Immediate,
@@ -197,12 +199,32 @@ impl CPU {
         self.interprect_with_callback(|_| {});
     }
 
+    fn interreupt_nmi(&mut self) {
+        let mut cur_status = self.status.clone();
+
+        // https://wiki.nesdev.com/w/index.php/Status_flags#The_B_flag
+        cur_status.insert(CPUStatus::BREAK);
+        cur_status.remove(CPUStatus::RESERVED);
+
+        // store pc, status
+        stack_push_u16(self, self.pc);
+        stack_push(self, cur_status.bits);
+
+        self.status.insert(CPUStatus::INTERRUPT_DISABLE);
+        self.pc = self.mem_read_u16(NMI_HANDLER_ADDR);
+
+        self.bus.tick(2);
+    }
+
     pub fn interprect_with_callback<T>(&mut self, mut callback: T)
     where
         T: FnMut(&mut CPU) -> (),
     {
         let ref opcodes: HashMap<u8, &'static opcode::Opcode> = *opcode::OPCODES_MAP;
-        // loop {
+
+        if self.bus.should_nmi() {
+            self.interreupt_nmi();
+        }
         callback(self);
 
         let op = self.mem_read(self.pc);
@@ -457,8 +479,9 @@ impl CPU {
         }
 
         if pc_state == self.pc {
-            self.pc += (code.bytes - 1) as u16
+            self.pc += (code.bytes - 1) as u16;
         }
-        // }
+
+        self.bus.tick(code.cycles);
     }
 }

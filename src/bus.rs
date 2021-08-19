@@ -1,4 +1,4 @@
-use crate::cartridge;
+﻿use crate::cartridge;
 use crate::mem;
 use crate::ppu::registers::BitwiseRegister;
 use crate::ppu::*;
@@ -17,6 +17,7 @@ pub struct Bus {
     prg_rom: Vec<u8>,
     // cartridge: cartridge::Cartridge,
     ppu: PPU,
+    cycles: usize,
 }
 
 impl Bus {
@@ -26,6 +27,7 @@ impl Bus {
             prg_rom: cartridge.prg,
             // cartridge: cartridge,
             ppu: PPU::new(cartridge.chr, cartridge.mirroring_type),
+            cycles: 0,
         }
     }
 
@@ -36,6 +38,15 @@ impl Bus {
             addr %= 0x4000;
         }
         self.prg_rom[addr as usize]
+    }
+
+    pub fn tick(&mut self, cycles: u8) {
+        self.cycles += cycles as usize;
+        self.ppu.tick(cycles as u16 * 3);
+    }
+
+    pub fn should_nmi(&mut self) -> bool {
+        self.ppu.should_nmi()
     }
 }
 
