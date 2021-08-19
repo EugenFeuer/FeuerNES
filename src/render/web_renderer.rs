@@ -358,17 +358,21 @@ impl Screen {
         gl.use_program(None);
 
         let frame = self.frame;
-        // self.cpu.reset();
-        for i in 0..240 {
+        let mut cycles = 0;
+        loop {
             self.cpu.interprect_with_callback(move |cpu| {
-                trace::trace(cpu, &frame);
+                // trace::trace(cpu, &frame);
                 let mut rng = rand::thread_rng();
                 cpu.bus.mem_write(0x00FE, rng.gen_range(1, 16));
             });
+            cycles += 1;
+            if cycles > 240 {
+                break
+            }
         }
+        self.frame += 1;
         // use web_sys::console;
         // console::log_1(&format!("frame: {}", frame).into());
-        self.frame += 1;
 
         let bytes = render(&mut self.cpu);
         self.update_texture(32, 32, bytes);
