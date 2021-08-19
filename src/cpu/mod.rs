@@ -56,7 +56,7 @@ bitflags::bitflags! {
     pub struct CPUStatus: u8 {
         const NEGATIVE          = 0b1000_0000;
         const OVERFLOW          = 0b0100_0000;
-        const UNUSED            = 0b0010_0000;
+        const RESERVED          = 0b0010_0000;
         const BREAK             = 0b0001_0000;
         const DECIMAL           = 0b0000_1000;
         const INTERRUPT_DISABLE = 0b0000_0100;
@@ -108,7 +108,7 @@ impl With<Vec<u8>> for CPU {
             acc: 0,
             rx: 0,
             ry: 0,
-            status: CPUStatus::from_bits_truncate(CPUStatus::UNUSED.bits()),
+            status: CPUStatus::from_bits_truncate(0b0011_0100),
             bus: Bus::new(Cartridge::new(&value).unwrap()),
 
             history: Vec::new(),
@@ -125,7 +125,7 @@ impl CPU {
             acc: 0,
             rx: 0,
             ry: 0,
-            status: CPUStatus::from_bits_truncate(CPUStatus::UNUSED.bits()),
+            status: CPUStatus::from_bits_truncate(0b0011_0100),
             bus: bus,
 
             history: Vec::new(),
@@ -137,7 +137,7 @@ impl CPU {
         self.acc = 0;
         self.rx = 0;
         self.ry = 0;
-        self.status = CPUStatus::from_bits_truncate(CPUStatus::UNUSED.bits());
+        self.status = CPUStatus::from_bits_truncate(0b0011_0100);
 
         self.pc = self.mem_read_u16(RESET_INTERRUPT_MEM_LOC);
         self.sp = STACK_RESET_LOC;
@@ -235,14 +235,14 @@ impl CPU {
             .get(&op)
             .expect(&format!("op: {:x} not exists or not impl .", op));
         // self.history.push(**code);
-        self.codes.insert(String::from(code.name));
+        // self.codes.insert(String::from(code.name));
 
         match op {
             0x00 => {
                 self.reset();
                 // println!("{:?}", self.codes);
                 // return;
-                // self.brk();
+                // brk(self);
             }
             // NOP
             0xEA => {}
